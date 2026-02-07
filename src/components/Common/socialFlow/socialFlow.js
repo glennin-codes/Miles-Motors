@@ -49,7 +49,7 @@ export default function SocialFlow() {
         </li>
         <li>
           <a
-            href="https://wa.me//+254733381707"
+            href="https://wa.me/254722354459"
             target="_blank"
             rel="noopener noreferrer"
           >

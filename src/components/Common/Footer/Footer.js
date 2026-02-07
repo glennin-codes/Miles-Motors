@@ -47,9 +47,9 @@ const Footer = () => {
             >
               <Twitter color="primary" />
             </Box>
-            <Box component="a" href="tel:+254733381707">
+            <Box component="a" href="tel:+254722354459">
               <PhoneRounded sx={{ mx: 1 }} />
-              (+254) 733 381 707
+              (+254) 722 354 459
             </Box>
           </Box>
         </Box>
@@ -155,17 +155,17 @@ const Footer = () => {
           >
             <Typography variant="h6">Copyright</Typography>
             <Typography variant="p">
-              Copyright © 2022 <br />
+              Copyright © 2026 <br />
               All rights reserved <br />
               Programmed, developed & designed by <br />
               <Link
-                href="https://techagecompanies.space"
+                href="https://wa.me/254713322025"
                 color="primary"
                 fontWeight="bold"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                TechAgeCompanies
+                Gel Digital Labs
               </Link>
             </Typography>
           </Grid>

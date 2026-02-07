@@ -173,7 +173,7 @@ const CarDetails = () => {
               variant="outlined"
               fullWidth
               component="a"
-              href="http://wa.me/+254733381707"
+              href="https://wa.me/254722354459"
               target="_blank"
             >
               Enquire
