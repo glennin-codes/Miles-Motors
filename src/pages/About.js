@@ -6,6 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import { usePageTitle } from "../hooks/usePageTitle";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import FlightLandIcon from "@mui/icons-material/FlightLand";
@@ -82,6 +83,7 @@ const LOGOS = [
 ];
 
 const About = () => {
+  usePageTitle("About");
   return (
     <Box
       sx={{

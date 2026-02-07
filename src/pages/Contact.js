@@ -12,8 +12,10 @@ import { SendEmail } from "../utilis/Api";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Toast from "../utilis/Toast";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 const Contact = () => {
+  usePageTitle("Contact");
   const [FirstName, setFirstName] = useState("");
   const [LastName, setLastName] = useState("");
   const [email, setEmail] = useState("");

@@ -3,6 +3,7 @@ import { Box, styled } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import { getCarById, getRecommendedCars } from "../api/cars";
 import { useParams } from "react-router-dom";
+import { usePageTitle } from "../hooks/usePageTitle";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -48,6 +49,8 @@ const CarDetails = () => {
       .catch((err) => { if (!cancelled) console.error(err); setCarDetails(null); });
     return () => { cancelled = true; };
   }, [carID]);
+
+  usePageTitle(null, carDetails ? `${carDetails.carName || "Car"} – Miles Motors | Nairobi` : "Car Details – Miles Motors");
 
   // Fetch recommended (same brand first, then other brands)
   useEffect(() => {

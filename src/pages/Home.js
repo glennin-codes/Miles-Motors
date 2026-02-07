@@ -3,12 +3,13 @@ import { Box } from '@mui/system';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import CarsSection from '../components/CarsSection/CarsSection';
-
+import { usePageTitle } from '../hooks/usePageTitle';
 import HomeBanner from '../components/Homepage/HomeBanner';
 //Disabled reviews
 // import ReviewSection from '../components/Homepage/ReviewSection';
 
 const Home = () => {
+    usePageTitle("Home");
     return (
         <Box sx={{ minHeight: '100vh' }}>
             <Box sx={{ px: { xs: 0, sm: 1, md: 2 } }}>

@@ -4,11 +4,13 @@ import React, { useState } from "react";
 import { PageHeading } from "../App";
 import CarsSection from "../components/CarsSection/CarsSection";
 import Typewriter from "typewriter-effect";
+import { usePageTitle } from "../hooks/usePageTitle";
 
 const PAGE_SIZE = 8;
 
 const Cars = () => {
   const [limit, setLimit] = useState(PAGE_SIZE);
+  usePageTitle("Used & New Cars");
 
   return (
     <>
