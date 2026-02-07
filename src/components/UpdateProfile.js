@@ -3,6 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
+import PasswordField from './Common/PasswordField/PasswordField';
 import {useRef} from "react"
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
@@ -90,28 +91,24 @@ return setError(`passwords do not match`)
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  
+                <PasswordField
                   fullWidth
                   name="password"
                   label="Password"
-                  type="password"
                   id="password"
-                   inputRef={passwordRef}
+                  inputRef={passwordRef}
                   autoComplete="new-password"
                   placeholder="leave blank to keep the same"
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                 
+                <PasswordField
                   fullWidth
                   name="confirm_password"
-                  label="Confirm_Password"
-                  type="password"
-                  id="password"
-                   inputRef={passwordConfirmationRef}
-                  autoComplete="confirm_password"
+                  label="Confirm password"
+                  id="confirm_password"
+                  inputRef={passwordConfirmationRef}
+                  autoComplete="new-password"
                 />
               </Grid>
             

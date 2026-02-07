@@ -1,5 +1,6 @@
-import axios from "axios";
-// *********** Send email
+import { sendContact } from "../api/contact";
+
+/** Send contact form to backend. Calls setSend with response data on success. */
 export const SendEmail = async ({
   FirstName,
   LastName,
@@ -9,12 +10,12 @@ export const SendEmail = async ({
   setSend,
 }) => {
   try {
-    const datas = { FirstName, LastName, email, number, message };
-    let res = await axios.post(`https://contactmilesapi.onrender.com/send`, datas);
-    if (res) {
-      setSend(res.data);
-    }
-  } catch (error) {
-    alert(error.response.data.msg);
+    const data = await sendContact({ FirstName, LastName, email, number, message });
+    if (data?.code === 1 && setSend) setSend(data);
+    else if (data?.msg) setSend({ msg: data.msg });
+  } catch (err) {
+    const msg = err.response?.data?.msg || err.message || "Failed to send message";
+    if (typeof alert !== "undefined") alert(msg);
+    throw err;
   }
 };

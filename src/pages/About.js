@@ -1,6 +1,17 @@
-import { Box, Typography } from "@mui/material";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+} from "@mui/material";
 import React from "react";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import FlightLandIcon from "@mui/icons-material/FlightLand";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import ShieldIcon from "@mui/icons-material/Shield";
 import image1 from "../images/image1.jpg";
 import image2 from "../images/image2.jpg";
 import image3 from "../images/image3.jpg";
@@ -29,128 +40,193 @@ import image25 from "../images/image25.jpg";
 import image26 from "../images/image26.jpg";
 import image27 from "../images/image27.jpg";
 import image29 from "../images/image29.jpg";
-// import image29 from '../images/image29.jpg'
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
+
+const SERVICES = [
+  {
+    icon: <DirectionsCarIcon sx={{ fontSize: 32 }} />,
+    title: "Car sales",
+    text: "Brand new and foreign used cars.",
+  },
+  {
+    icon: <SwapHorizIcon sx={{ fontSize: 32 }} />,
+    title: "Trade-in",
+    text: "Upgrade from your current car to a newer model.",
+  },
+  {
+    icon: <FlightLandIcon sx={{ fontSize: 32 }} />,
+    title: "Importation",
+    text: "We import your desired car on your behalf.",
+  },
+  {
+    icon: <InventoryIcon sx={{ fontSize: 32 }} />,
+    title: "Local stock",
+    text: "We buy and resell locally used cars.",
+  },
+  {
+    icon: <AccountBalanceIcon sx={{ fontSize: 32 }} />,
+    title: "Financing",
+    text: "We work with banks and micro-finance for car loans.",
+  },
+  {
+    icon: <ShieldIcon sx={{ fontSize: 32 }} />,
+    title: "Insurance",
+    text: "We liaise with insurance firms for our customers.",
+  },
+];
+
+const LOGOS = [
+  image1, image2, image3, image4, image5, image6, image7, image8, image9,
+  image10, image11, image12, image13, image14, image15, image16, image17,
+  image18, image19, image20, image21, image22, image23, image24, image25,
+  image26, image27, image29,
+];
 
 const About = () => {
-  const theme = createTheme({
-    Typography: {
-      fontFamily: ["roboto"].join(","),
-      fontWeightLight: 600,
-    },
-  });
-
   return (
-    <ThemeProvider theme={theme}>
-      <Box
+    <Box
+      sx={{
+        maxWidth: 1000,
+        mx: "auto",
+        px: { xs: 2, sm: 3 },
+        py: { xs: 4, md: 6 },
+      }}
+    >
+      <Typography
+        variant="h4"
+        component="h1"
+        color="primary"
+        fontWeight="700"
+        align="center"
+        sx={{ mb: 3, fontSize: { xs: "1.75rem", md: "2.25rem" } }}
+      >
+        About Us
+      </Typography>
+
+      <Card
+        variant="outlined"
         sx={{
-          marginTop: 2,
-          marginLeft: { xs: 5, sm: 10, md: 30 },
-          marginRight: { xs: 5, sm: 10, md: 30 },
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
+          mb: 5,
+          borderRadius: 2,
+          borderColor: "grey.200",
+          bgcolor: "grey.50",
         }}
       >
-        <Typography
-          variant="h4"
-          color="red"
-          sx={{ textAlign: "center", marginBottom: 2 }}
-        >
-          About Us
-        </Typography>
-        <Box sx={{ textIndent: "30px", lineHeight: "30px" }}>
-          <Typography variant="p" sx={{ fontSize: "1rem" }}>
-            Miles Motors Ltd was established in 2011. We are a Brand New & Used
-            Car Dealership that is situated along Chyulu road, behind The Kenya
-            National Library in Upper-hill, Nairobi. We offer the best deal
-            prices around and also keep up to our record of being Kenya's Number
-            1 local and international car dealership.
+        <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: { xs: "1.05rem", md: "1.125rem" },
+              lineHeight: 1.75,
+              color: "text.primary",
+            }}
+          >
+            Miles Motors Ltd was established in 2011. We are a brand new & used
+            car dealership on Chyulu Road, behind the Kenya National Library in
+            Upper Hill, Nairobi. We offer competitive prices and maintain our
+            record as Kenya’s leading local and international car dealership.
           </Typography>
-        </Box>
-        <Typography
-          variant="h5"
-          sx={{
-            marginTop: 5,
-            color: "red",
-            textAlign: "center",
-            marginBottom: 2,
-          }}
-        >
-          Services Offered
-        </Typography>
-        <Box sx={{ lineHeight: "30px", marginLeft: 2 }}>
-          <ol>
-            <li>(1) Car Sales. i.e: Brand New and Foreign Used cars.</li>
-            <li>
-              (2) Trade-in: For those wanting to upgrade from their current used
-              units to a newer version.
-            </li>
-            <li>(3) Importation of desired cars on behalf of customers.</li>
-            <li>(4) Buy locally used cars for re-sale.</li>
-            <li>
-              (5) Liaise with financial institutions, i.e: Banks & Micro Finance
-              to provide car financing.
-            </li>
-            <li>
-              (6) Liaise with Insurance firms to provide insurance for customers
-              text
-            </li>
-          </ol>
-        </Box>
-        <Typography
-          variant="h5"
-          sx={{
-            marginTop: 1,
-            color: "red",
-            textAlign: "center",
-            marginBottom: 2,
-          }}
-        >
-          Our Brands
-        </Typography>
-        <Box sx={{ textIndent: "30px", lineHeight: "30px" }}>
-          <Typography variant="p" fontStyle="sans-serif">
-            We stock a wide variety of brands including, but not limited to:
-            Toyota, Mercedes Benz, Lexus, Nissan, Subaru, Mazda, Isuzu, Suzuki,
-            Volkswagen, Range Rover, Hyundai, Mitsubishi, Volvo, Honda, BMW,
-            Audi, Jeep etc.
-          </Typography>
-        </Box>
-        <Box sx={{ marginTop: 3 }}>
-          <img src={image1} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image2} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image3} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image4} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image5} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image6} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image7} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image8} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image9} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image10} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image11} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image12} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image13} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image14} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image15} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image16} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image17} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image18} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image19} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image20} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image21} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image22} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image23} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image24} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image25} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image26} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image27} alt="Cars_Logos" height="10%" width="70" />
-          <img src={image29} alt="Cars_Logos" height="10%" width="70" />
-        </Box>
+        </CardContent>
+      </Card>
+
+      <Typography
+        variant="h6"
+        color="primary"
+        fontWeight="700"
+        align="center"
+        sx={{ mb: 2, fontSize: { xs: "1.15rem", md: "1.35rem" } }}
+      >
+        Services Offered
+      </Typography>
+      <Grid container spacing={2} sx={{ mb: 5 }}>
+        {SERVICES.map((s, i) => (
+          <Grid item xs={12} sm={6} md={4} key={i}>
+            <Card
+              variant="outlined"
+              sx={{
+                height: "100%",
+                borderRadius: 2,
+                borderColor: "grey.200",
+                "&:hover": { borderColor: "primary.light", bgcolor: "grey.50" },
+              }}
+            >
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ color: "primary.main", mb: 1 }}>{s.icon}</Box>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="600"
+                  gutterBottom
+                  sx={{ fontSize: "1.1rem" }}
+                >
+                  {s.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ fontSize: { xs: "0.95rem", md: "1rem" }, lineHeight: 1.5 }}
+                >
+                  {s.text}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Typography
+        variant="h6"
+        color="primary"
+        fontWeight="700"
+        align="center"
+        sx={{ mb: 2, fontSize: { xs: "1.15rem", md: "1.35rem" } }}
+      >
+        Our Brands
+      </Typography>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        align="center"
+        sx={{
+          mb: 3,
+          maxWidth: 560,
+          mx: "auto",
+          fontSize: { xs: "1rem", md: "1.0625rem" },
+          lineHeight: 1.6,
+        }}
+      >
+        We stock a wide variety of brands including Toyota, Mercedes Benz,
+        Lexus, Nissan, Subaru, Mazda, Isuzu, Suzuki, Volkswagen, Range Rover,
+        Hyundai, Mitsubishi, Volvo, Honda, BMW, Audi, Jeep and more.
+      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 2,
+        }}
+      >
+        {LOGOS.map((src, i) => (
+          <Box
+            key={i}
+            component="img"
+            src={src}
+            alt=""
+            sx={{
+              width: 56,
+              height: 56,
+              objectFit: "contain",
+              p: 0.5,
+              bgcolor: "grey.50",
+              borderRadius: 1,
+              border: "1px solid",
+              borderColor: "grey.200",
+            }}
+          />
+        ))}
       </Box>
-    </ThemeProvider>
-  );
+    </Box>
+   );
+
 };
 
 export default About;

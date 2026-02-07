@@ -1,44 +1,186 @@
-.container{
-    height: 100%;
-    width: 100%;
-    text-align: center;
-    color: black;
-    border: none;
-  
+/* Wrapper: fills parent (CarDetails Box) */
+.carousel-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-height: 400px;
+  position: relative;
 }
-.photo--container{
-    width: 100%;
-    height: 350px;
-    border: none;
-    
-}
-.slyder{
-    background:#00000011;
-    border-radius: 5px;
 
+.slyder.slick-slider {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
-.car--photo{
-    height: 100%;
-    width:100%;
-    margin-bottom: 10px;
-    border-radius: 5px;
-   transition:  0.5s ease-in-out;
-   object-fit: contain;
-   margin-bottom: 10px;
+.slyder .slick-list {
+  flex: 1;
+  min-height: 0;
 }
-.button{
-    background-color: crimson;
-    padding: 10px;
-    cursor: pointer;
-    outline: none;
-    margin-right: 20px;
-    margin-top: 10px;
-    color: black;
-    border-radius: 4px;
-    border: none;
-    margin-bottom:10px;
+.slyder .slick-dots {
+  flex-shrink: 0;
 }
-.button:hover{
-    background-color:white;
-    color: crimson;
+
+.slyder .slick-list,
+.slyder .slick-track,
+.slyder .slick-slide,
+.slyder .slick-slide > div {
+  height: 100%;
+}
+
+.slyder {
+  height: 100%;
+  background: transparent;
+  border-radius: 8px;
+}
+
+/* Hide default slick arrow buttons (we use custom) */
+.slyder .slick-prev,
+.slyder .slick-next {
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+}
+.slyder .slick-prev { left: 12px; }
+.slyder .slick-next { right: 12px; }
+.slyder .slick-prev:before,
+.slyder .slick-next:before {
+  content: none;
+}
+
+/* Overlay arrows on the image */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  transition: background 0.2s, transform 0.2s;
+}
+.carousel-arrow:hover {
+  background: #fff;
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+.carousel-arrow--prev { left: 12px; }
+.carousel-arrow--next { right: 12px; }
+.carousel-arrow svg {
+  font-size: 28px;
+}
+
+.photo--container {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  border: none;
+  overflow: hidden;
+}
+
+.photo--container__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: zoom-in;
+  min-height: 400px;
+}
+
+.carousel-expand-btn {
+  position: absolute !important;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #333 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.carousel-expand-btn:hover {
+  background: #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.car--photo {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  border-radius: 8px;
+  transition: transform 0.4s ease;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.slyder:hover .car--photo {
+  transform: scale(1.02);
+}
+
+/* Thumbnail strip below main image */
+.carousel-thumbnails {
+  flex-shrink: 0;
+  padding: 12px 0 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin-top: 8px;
+}
+
+.carousel-thumbnails__label {
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.carousel-thumbnails__list {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  justify-content: center;
+}
+
+.carousel-thumbnails__list li {
+  margin: 0;
+  padding: 0;
+  width: auto;
+  height: auto;
+}
+
+.carousel-thumb {
+  display: block;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f5f5f5;
+  transition: border-color 0.2s, opacity 0.2s;
+}
+.carousel-thumb:hover {
+  opacity: 0.9;
+}
+.carousel-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Active thumbnail */
+.carousel-thumbnails__list li.slick-active .carousel-thumb {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 1px #d32f2f;
 }

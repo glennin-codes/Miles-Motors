@@ -1,446 +1,248 @@
+import React, { useState } from "react";
 import {
-    Button,
-    Alert,
-    FormControl,
-    Grid,
-    InputAdornment,
-    InputLabel,
-    MenuItem,
-    Select,
-    TextField,
-    Typography,
-  } from "@mui/material";
-  import { Box, styled } from "@mui/system";
-  import axios from "axios";
-  import React from "react";
-  import { Link } from "react-router-dom";
-  import useAuth from "../AdminParts/../../../others/useAuthContext";
-  import { useHistory } from "react-router-dom";
-  
-  // styled component for font awesome icon
-  const Icon = styled("i")(({ theme }) => ({
-    color: "#00000099",
-    fontSize: "22px",
-    margin: "5px 10px 5px 0",
-  }));
-  
-  const AddNewCar = ({ setProcessStatus, showSnackbar }) => {
-    const [status, setStatus] = React.useState("");
-    const [failed, setFailed] = React.useState("");
-    const history = useHistory();
-    const { currentUser, logout } = useAuth();
-    const [error, setError] = React.useState("");
-    async function handleLogout() {
-      setError("");
-      try {
-        await logout();
-        history.push("/login");
-      } catch (e) {
-        setFailed(`failed to logout!`);
-      }
+  Alert,
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stepper,
+  Step,
+  StepLabel,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { Link, useHistory, useRouteMatch } from "react-router-dom";
+import useAuth from "../../../others/useAuthContext";
+import { uploadCarImages, createCar } from "../../../api/cars";
+
+const BRANDS = [
+  "Toyota", "Subaru", "Audi", "Mazda", "Ford", "Nissan", "Suzuki", "Volkswagen",
+  "Honda", "Isuzu", "Land Rover", "Range Rover", "Lexus", "Daihatsu", "Jeep",
+  "BMW", "Porsche", "Mercedes Benz", "Hyundai", "Mitsubishi", "KIA", "Peugeot",
+  "Renault", "Mahindra", "Chevrolet", "Volvo", "Scania",
+];
+const FUELS = ["gasoline", "diesel", "bio-diesel", "ethanol", "petrol"];
+
+export default function AddNewCar() {
+  const history = useHistory();
+  const match = useRouteMatch("/dashboard");
+  const dashboardUrl = match ? match.url : "";
+  const { currentUser, logout } = useAuth();
+  const [activeStep, setActiveStep] = useState(0); // 0 = Car details, 1 = Upload images
+  const [uploadedKeys, setUploadedKeys] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [values, setValues] = useState({});
+  const [carType, setCarType] = useState("");
+  const [fuel, setFuel] = useState("");
+
+  const handleValueChange = (prop) => (e) => {
+    setValues((prev) => ({ ...prev, [prop]: e.target.value }));
+  };
+
+  const handleImageUpload = async (e) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length === 0) return;
+    setError("");
+    setUploading(true);
+    try {
+      const keys = await uploadCarImages(files);
+      setUploadedKeys((prev) => [...prev, ...keys]);
+    } catch (err) {
+      setError(err.message || "Upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
     }
-  
-    const [values, setValues] = React.useState({}); // form values state
-    const [carType, setCarType] = React.useState(""); // form car type state
-    const [fuel, setFuel] = React.useState(""); // form fuel type state
-    // handle changing value in form
-    const handleValueChange = (prop) => (event) => {
-      setValues({ ...values, [prop]: event.target.value });
+  };
+
+  const removeImage = (index) => {
+    setUploadedKeys((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (uploadedKeys.length === 0) {
+      setError("Upload at least one image.");
+      return;
+    }
+    setError("");
+    setSuccess("");
+    setSubmitLoading(true);
+    const body = {
+      carName: values.carName,
+      carType: carType || values.carType,
+      color: values.color,
+      transmission: values.transmission,
+      fuel: fuel || values.fuel,
+      engine: values.engine,
+      mileage: values.mileage,
+      price: Number(values.price),
+      description: values.description,
+      carImg: uploadedKeys[0],
+      image2: uploadedKeys[1],
+      image3: uploadedKeys[2],
+      image4: uploadedKeys[3],
+      image5: uploadedKeys[4],
+      image6: uploadedKeys[5],
+      image7: uploadedKeys[6],
+      image8: uploadedKeys[7],
+      image9: uploadedKeys[8],
+      image10: uploadedKeys[9],
     };
-    // add new car in database
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      const newCarInfo = { ...values, carType, fuel };
-      axios
-        .post("https://milesbackend.onrender.com/car", newCarInfo)
-        .then(({ data }) => {
-          if (data.code === 1) {
-            setStatus(`car added succesfully`);
-            // showSnackbar()
-            event.target.reset();
-          }
-        })
-        .catch((err) => {
-          setError(`car not added, there was an error`);
-          //   showSnackbar() // show notification popup containing status
-        });
-    };
-    return (
-      <Box>
-        {error && <Alert severity="error">{error}</Alert>}
-        {status && <Alert severity="success">{status}</Alert>}
-        {failed && <Alert severity="error">{failed}</Alert>}
-        <Typography
-          variant="h4"
-          align="center"
-          color="primary"
-          fontWeight="bold"
-        >{`User:${currentUser.email}`}</Typography>
-        <Typography variant="h4" align="center" color="primary" fontWeight="bold">
-          Add New Car In Shop
+    try {
+      await createCar(body);
+      setSuccess("Car added successfully.");
+      setUploadedKeys([]);
+      setValues({});
+      setCarType("");
+      setFuel("");
+    } catch (err) {
+      setError(err.message || "Failed to add car");
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  const steps = ["Car details", "Upload images"];
+  const detailsFilled = values.carName && values.description && (carType || values.carType) && (fuel || values.fuel) && values.price != null;
+  const canNext = activeStep === 0 ? detailsFilled : true;
+  const canSubmit = activeStep === 1 && uploadedKeys.length > 0 && detailsFilled;
+
+  return (
+    <Box sx={{ maxWidth: 700, mx: "auto", p: 2 }}>
+      <Typography variant="h5" align="center" color="primary" fontWeight="bold" gutterBottom>
+        Add New Car
+      </Typography>
+      {currentUser && (
+        <Typography variant="body2" align="center" color="text.secondary" sx={{ mb: 2 }}>
+          {currentUser.email}
         </Typography>
-        <Box maxWidth="sm" sx={{ my: 4, mx: "auto" }}>
-          {/* new car information form */}
-          <form onSubmit={handleSubmit}>
-            <Grid
-              container
-              rowSpacing={3.5}
-              columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-            >
-              <Grid item xs={12}>
-                {/* car name */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-file-signature"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Car Name"
-                    variant="standard"
-                    required
-                    type="text"
-                    onChange={handleValueChange("carName")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={6} md={4}>
-                {/* car body color */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-palette"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Body Color"
-                    variant="standard"
-                    required
-                    type="text"
-                    onChange={handleValueChange("color")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={6} md={4}>
-                {/* car body color */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-palette"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Unique ID"
-                    variant="standard"
-                    required
-                    type="text"
-                    onChange={handleValueChange("carID")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={6} md={4}>
-                {/* car type selector */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-car"></Icon>
-                  <FormControl variant="standard" fullWidth>
-                    <InputLabel>Car Brand</InputLabel>
-                    <Select 
-                       
-                      fullWidth
-                      required
-                      value={carType}
-                      onChange={(e) => setCarType(e.target.value)}
-                    >
-                      <MenuItem value={"Toyota"}>Toyota</MenuItem>
-                      <MenuItem value={"Subaru"}>Subaru</MenuItem>
-                      <MenuItem value={"Audi"}>Audi</MenuItem>
-                      <MenuItem value={"Mazda"}>Mazda</MenuItem>
-                      <MenuItem value={"Ford"}>Ford</MenuItem>
-                      <MenuItem value={"Nissan"}>Nissan</MenuItem>
-                      <MenuItem value={"Suzuki"}>Suzuki</MenuItem>
-                      <MenuItem value={"Volkswagen"}>Volks Wagen</MenuItem>
-                      <MenuItem value={"Honda"}>Honda</MenuItem>
-                      <MenuItem value={"Isuzu"}>Isuzu</MenuItem>
-                      <MenuItem value={"Land Rover"}>Land Rover</MenuItem>
-                      <MenuItem value={"Range Rover"}>Range Rover</MenuItem>
-                      <MenuItem value={" Lexus"}>Lexus</MenuItem>
-                      <MenuItem value={"Daihatsu"}>Daihatsu</MenuItem>
-                      <MenuItem value={"Jeep"}>Jeep</MenuItem>
-                      <MenuItem value={"BMW"}>BMW</MenuItem>
-                      <MenuItem value={"Porsche"}>Porsche</MenuItem>
-                      <MenuItem value={"Mercedes Benz"}>Mercedes Benz</MenuItem>
-                      <MenuItem value={"Hyundai"}>Hyundai</MenuItem>
-                      <MenuItem value={"Mitsubishi"}>Mitsubishi</MenuItem>
-                      <MenuItem value={" KIA"}> KIA</MenuItem>
-                      <MenuItem value={"Peugeot"}>Peugeot</MenuItem>
-                      <MenuItem value={"Renault"}>Renault</MenuItem>
-                      <MenuItem value={"Mahindra"}>Mahindra</MenuItem>
-                      <MenuItem value={"Chevrolet"}>Chevrolet</MenuItem>
-                      <MenuItem value={"Volvo"}>Volvo</MenuItem>
-                      <MenuItem value={"Scania"}> Scania</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                {/* car mileage input */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-road"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Mileage"
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="start">km</InputAdornment>
-                      ),
-                    }}
-                    variant="standard"
-                    type="number"
-                    onChange={handleValueChange("mileage")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                {/* car transmission status */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-tachometer-alt"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Transmission"
-                    variant="standard"
-                    required
-                    text="text"
-                    onChange={handleValueChange("transmission")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                {/* car engine info */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-cogs"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Engine"
-                    variant="standard"
-                    required
-                    type="text"
-                    onChange={handleValueChange("engine")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={5} md={4}>
-                {/* car fuel type input */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-gas-pump"></Icon>
-                  <FormControl variant="standard" fullWidth>
-                    <InputLabel>Fuel</InputLabel>
-                    <Select
-                      fullWidth
-                      required
-                      value={fuel}
-                      onChange={(e) => setFuel(e.target.value)}
-                    >
-                      <MenuItem value={"gasoline"}>Gasoline</MenuItem>
-                      <MenuItem value={"diesel"}>Diesel</MenuItem>
-                      <MenuItem value={"bio-diesel"}>Bio-Diesel</MenuItem>
-                      <MenuItem value={"ethanol"}>Ethanol</MenuItem>
-                      <MenuItem value={"petrol"}>Petrol</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-              </Grid>
-              <Grid item xs={7} md={8}>
-                {/* car price in us dollar */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-dollar-sign"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Price"
-                    variant="standard"
-                    required
-                    type="number"
-                    onChange={handleValueChange("price")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car image url */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-image"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Img URL"
-                    variant="standard"
-                    required
-                    type="url"
-                    onChange={handleValueChange("carImg")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car image url */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-image"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Image 2 URL"
-                    variant="standard"
-                    required
-                    type="url"
-                    onChange={handleValueChange("image2")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car image url */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-image"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Image 3 URL"
-                    variant="standard"
-                    required
-                    type="url"
-                    onChange={handleValueChange("image3")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car image url */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-image"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Image 4 URL"
-                    variant="standard"
-                    required
-                    type="url"
-                    onChange={handleValueChange("image4")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car image url */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-image"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Image 5 URL"
-                    variant="standard"
-                    required
-                    type="url"
-                    onChange={handleValueChange("image5")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car image url */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-image"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Image 6 URL"
-                    variant="standard"
-                   
-                    type="url"
-                    onChange={handleValueChange("image6")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car image url */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-image"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Image 7 URL"
-                    variant="standard"
-                    
-                    type="url"
-                    onChange={handleValueChange("image7")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car image url */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-image"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Image 8 URL"
-                    variant="standard"
-                    
-                    type="url"
-                    onChange={handleValueChange("image8")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car image url */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-image"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Image 9 URL"
-                    variant="standard"
-                    
-                    type="url"
-                    onChange={handleValueChange("image9")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car image url */}
-                <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                  <Icon className="fas fa-image"></Icon>
-                  <TextField
-                    fullWidth
-                    label="Image 10 URL"
-                    variant="standard"
-                    
-                    type="url"
-                    onChange={handleValueChange("image10")}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                {/* car description textarea */}
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={4}
-                  sx={{ my: 2 }}
-                  label="Description"
-                  variant="outlined"
-                  type="text"
-                  required
-                  onChange={handleValueChange("description")}
-                />
-              </Grid>
-              <Grid item xs={12} sx={{ textAlign: "right" }}>
-                <Button
-                  type="submit"
-                  variant="outlined"
-                  disabled={
-                    currentUser?.email !== "milesmotorssocialmedia@gmail.com"
-                  } //disbling add to database
-                >
-                  Add to Database
-                </Button>
-              </Grid>
-  
-              <Grid item xs={12} sx={{ textAlign: "right" }}>
-                <Typography component={Link} to="/manage">
-                  Manage All cars
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sx={{ textAlign: "right" }}>
-                <Typography onClick={handleLogout} component={Button}>
-                  Logout
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sx={{ textAlign: "right" }}>
-                <Typography>
-                  {status && <Alert severity="success">{status}</Alert>}
-                  {error && <Alert severity="error">{error}</Alert>}
-                </Typography>
-              </Grid>
+      )}
+
+      <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+        {steps.map((label) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+
+      {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>{error}</Alert>}
+      {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+
+      {/* Step 0: Car details */}
+      {activeStep === 0 && (
+        <form onSubmit={(e) => { e.preventDefault(); if (canNext) setActiveStep(1); }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Car Name" required value={values.carName || ""} onChange={handleValueChange("carName")} />
             </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField fullWidth label="Body Color" value={values.color || ""} onChange={handleValueChange("color")} />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Brand</InputLabel>
+                <Select value={carType} onChange={(e) => setCarType(e.target.value)} label="Brand">
+                  {BRANDS.map((b) => (
+                    <MenuItem key={b} value={b}>{b}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField fullWidth label="Mileage" type="number" InputProps={{ endAdornment: "km" }} value={values.mileage || ""} onChange={handleValueChange("mileage")} />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField fullWidth label="Transmission" value={values.transmission || ""} onChange={handleValueChange("transmission")} />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField fullWidth label="Engine" value={values.engine || ""} onChange={handleValueChange("engine")} />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Fuel</InputLabel>
+                <Select value={fuel} onChange={(e) => setFuel(e.target.value)} label="Fuel">
+                  {FUELS.map((f) => (
+                    <MenuItem key={f} value={f}>{f}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Price" type="number" required value={values.price ?? ""} onChange={handleValueChange("price")} />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField fullWidth label="Description" required multiline rows={4} value={values.description || ""} onChange={handleValueChange("description")} />
+            </Grid>
+            <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Button component={Link} to={dashboardUrl ? `${dashboardUrl}/manage_cars` : "/dashboard/manage_cars"}>Manage cars</Button>
+              <Button type="submit" variant="contained" disabled={!canNext}>
+                Next
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      )}
+
+      {/* Step 1: Upload images (final step) */}
+      {activeStep === 1 && (
+        <Box>
+          <Typography variant="subtitle1" gutterBottom>Upload car images (processed and stored)</Typography>
+          <input
+            accept="image/*"
+            type="file"
+            multiple
+            onChange={handleImageUpload}
+            style={{ display: "none" }}
+            id="car-images"
+          />
+          <label htmlFor="car-images">
+            <Button variant="outlined" component="span" disabled={uploading}>
+              {uploading ? "Uploading…" : "Choose images"}
+            </Button>
+          </label>
+          <Box sx={{ mt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
+            {uploadedKeys.map((key, i) => (
+              <Typography
+                key={i}
+                variant="caption"
+                sx={{
+                  px: 1,
+                  py: 0.5,
+                  bgcolor: "action.selected",
+                  borderRadius: 1,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                }}
+              >
+                Image {i + 1}
+                <Button size="small" sx={{ minWidth: 0, p: 0 }} onClick={() => removeImage(i)}>×</Button>
+              </Typography>
+            ))}
+          </Box>
+          <form onSubmit={handleSubmit}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
+              <Button type="button" onClick={() => setActiveStep(0)}>Back</Button>
+              <Button type="submit" variant="contained" disabled={!canSubmit || submitLoading}>
+                {submitLoading ? "Adding…" : "Add car"}
+              </Button>
+            </Box>
           </form>
         </Box>
+      )}
+
+      <Box sx={{ mt: 3, textAlign: "center" }}>
+        <Button component={Link} to={dashboardUrl ? `${dashboardUrl}/manage_cars` : "/dashboard/manage_cars"} sx={{ mr: 1 }}>Manage cars</Button>
+        <Button onClick={() => { logout(); history.push("/"); }}>Logout</Button>
       </Box>
-    );
-  };
-  
-  export default AddNewCar;
+    </Box>
+  );
+}

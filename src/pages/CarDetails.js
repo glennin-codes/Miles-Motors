@@ -1,17 +1,16 @@
 import { Button, Grid, Typography } from "@mui/material";
 import { Box, styled } from "@mui/system";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { getCarById, getRecommendedCars } from "../api/cars";
+import { useParams } from "react-router-dom";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import LoadingSpinner from "../components/Common/LoadingSpinner/LoadingSpinner";
-import { useHistory } from "react-router-dom";
 import ImageCarousel from "../components/CarsSection/Courosel/ImageCourosel";
-import CarsSection from "../components/CarsSection/CarsSection";
+import SingleCar from "../components/CarsSection/SingleCar/SingleCar";
 
 const DetailsContainer = styled(Grid)(({ theme }) => ({
   flexDirection: "column",
@@ -20,29 +19,64 @@ const DetailsContainer = styled(Grid)(({ theme }) => ({
   },
 }));
 
+const RECOMMENDED_PAGE_SIZE = 8;
+
 const CarDetails = () => {
-  const { carID } = useParams(); // get car id from url parameter
+  const { carID } = useParams();
 
   const [carDetails, setCarDetails] = useState(null);
-  // destructure car details
+  const [recommendedCars, setRecommendedCars] = useState([]);
+  const [recommendedTotal, setRecommendedTotal] = useState(0);
+  const [recommendedLoading, setRecommendedLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const {
     carName,
     carType,
     transmission,
     fuel,
     color,
-    mileage,
     price,
     engine,
     description,
-  } = carDetails ? carDetails : {};
+  } = carDetails || {};
 
   useEffect(() => {
-    axios
-      .get(`https://milesbackend.onrender.com/car/${carID}`)
-      .then(({ data }) => setCarDetails(data.data))
-      .catch((err) => console.log(err));
+    let cancelled = false;
+    getCarById(carID)
+      .then((data) => { if (!cancelled) setCarDetails(data); })
+      .catch((err) => { if (!cancelled) console.error(err); setCarDetails(null); });
+    return () => { cancelled = true; };
   }, [carID]);
+
+  // Fetch recommended (same brand first, then other brands)
+  useEffect(() => {
+    if (!carID) return;
+    let cancelled = false;
+    setRecommendedLoading(true);
+    getRecommendedCars(carID, { limit: RECOMMENDED_PAGE_SIZE, offset: 0 })
+      .then((res) => {
+        if (!cancelled) {
+          setRecommendedCars(res?.data ?? []);
+          setRecommendedTotal(res?.total ?? 0);
+        }
+      })
+      .catch(() => { if (!cancelled) setRecommendedCars([]); setRecommendedTotal(0); })
+      .finally(() => { if (!cancelled) setRecommendedLoading(false); });
+    return () => { cancelled = true; };
+  }, [carID]);
+
+  const loadMoreRecommended = () => {
+    setLoadingMore(true);
+    getRecommendedCars(carID, { limit: RECOMMENDED_PAGE_SIZE, offset: recommendedCars.length })
+      .then((res) => {
+        const next = res?.data ?? [];
+        setRecommendedCars((prev) => [...prev, ...next]);
+      })
+      .finally(() => setLoadingMore(false));
+  };
+
+  const hasMoreRecommended = recommendedCars.length < recommendedTotal;
 
   // create table rows
   function createData(name, value) {
@@ -58,8 +92,6 @@ const CarDetails = () => {
     // createData("mileage", `${mileage} meters`),
   ];
 
-  const history = useHistory();
-
   // Numbers with Commas over 1000
   function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -73,12 +105,13 @@ const CarDetails = () => {
         <Grid item xs={12} md={7}>
           <Box
             sx={{
-              height: "500px",
-              background: "#00000011",
+              height: { xs: "360px", sm: "420px", md: "500px" },
+              width: "100%",
               display: "flex",
-              justifyContent: "center",
-              borderRadius: "10px",
-              "&:hover img": { transform: "scale(1.1)" },
+              flexDirection: "column",
+              borderRadius: 2,
+              overflow: "hidden",
+              bgcolor: "#fff",
             }}
           >
             <ImageCarousel />
@@ -149,7 +182,49 @@ const CarDetails = () => {
         </Grid>
       </DetailsContainer>
 
-      <CarsSection />
+      {/* Similar cars (same brand first); "View more" loads more same brand then other brands */}
+      {carDetails && (
+        <Box sx={{ width: "100%", maxWidth: 1720, mx: "auto", px: { xs: 1.5, sm: 2 }, mt: 6 }}>
+          <Typography
+            variant="h5"
+            color="primary"
+            fontWeight="700"
+            sx={{ mb: 2, fontSize: { xs: "1.25rem", md: "1.5rem" } }}
+          >
+            Similar cars
+          </Typography>
+          {recommendedLoading ? (
+            <Typography color="text.secondary">Loading similar cars…</Typography>
+          ) : recommendedCars.length > 0 ? (
+            <>
+              <Grid
+                container
+                rowSpacing={{ xs: 2.5, sm: 3 }}
+                columnSpacing={{ xs: 2, sm: 2, md: 2.5, lg: 3 }}
+              >
+                {recommendedCars.map((carInfo) => (
+                  <SingleCar carInfo={carInfo} key={carInfo.carID} />
+                ))}
+              </Grid>
+              {hasMoreRecommended && (
+                <Box sx={{ textAlign: "center", mt: 3 }}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    size="large"
+                    onClick={loadMoreRecommended}
+                    disabled={loadingMore}
+                  >
+                    {loadingMore ? "Loading…" : "View more cars"}
+                  </Button>
+                </Box>
+              )}
+            </>
+          ) : (
+            <Typography color="text.secondary">No similar cars at the moment.</Typography>
+          )}
+        </Box>
+      )}
     </Box>
   );
 };

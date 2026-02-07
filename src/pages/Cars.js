@@ -1,10 +1,15 @@
 import { Box } from "@mui/system";
-import React from "react";
+import { Button } from "@mui/material";
+import React, { useState } from "react";
 import { PageHeading } from "../App";
 import CarsSection from "../components/CarsSection/CarsSection";
 import Typewriter from "typewriter-effect";
 
+const PAGE_SIZE = 8;
+
 const Cars = () => {
+  const [limit, setLimit] = useState(PAGE_SIZE);
+
   return (
     <>
       <Box
@@ -18,7 +23,7 @@ const Cars = () => {
         }}
       >
         <img
-          src="/images/cars-page-banner.jpg"
+          src="/images/homepage/cars-page-banner.webp"
           alt="cars"
           style={{ width: "100%" }}
         />
@@ -47,7 +52,6 @@ const Cars = () => {
                   .typeString("Foreign")
                   .pauseFor(2000)
                   .deleteChars(5)
-
                   .deleteChars(6)
                   .start();
               }}
@@ -56,7 +60,16 @@ const Cars = () => {
           </PageHeading>
         </Box>
       </Box>
-      <CarsSection />
+      <CarsSection dataAmount={limit} />
+      <Box sx={{ textAlign: "center", py: 3 }}>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => setLimit((prev) => prev + PAGE_SIZE)}
+        >
+          View more
+        </Button>
+      </Box>
     </>
   );
 };

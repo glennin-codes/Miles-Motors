@@ -3,6 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
+import PasswordField from './Common/PasswordField/PasswordField';
 import {useRef} from "react"
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
@@ -28,20 +29,18 @@ export default function Login() {
     const emailRef=useRef();
     const passwordRef=useRef();
  
- async  function handleSubmit(e){
-        e.preventDefault()
-        
-    try{
-        setError('')
-        setLoading(true)
- await  login(emailRef.current.value,passwordRef.current.value)
- history.push('/profile')
-    }
-    catch(error){
-setError(`failed to login!${error}`)
-    }
-    setLoading(false)
-      
+    async function handleSubmit(e) {
+      e.preventDefault();
+      try {
+        setError('');
+        setLoading(true);
+        await login(emailRef.current.value, passwordRef.current.value);
+        history.push('/dashboard');
+      } catch (err) {
+        setError(err.response?.data?.msg || err.message || 'Login failed');
+      } finally {
+        setLoading(false);
+      }
     } 
    
 
@@ -80,15 +79,14 @@ setError(`failed to login!${error}`)
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
+                <PasswordField
                   required
                   fullWidth
                   name="password"
                   label="Password"
-                  type="password"
                   id="password"
-                   inputRef={passwordRef}
-                  autoComplete="new-password"
+                  inputRef={passwordRef}
+                  autoComplete="current-password"
                 />
               </Grid>
              

@@ -16,19 +16,19 @@ const bannerSlides = [
     {
         id: 1,
         label: 'Get foreign used cars ',
-        imgPath: '/images/all-cars/1.jpg',
+        imgPath: '/images/all-cars/1.webp',
     },
    
     {
         id: 2,
         label: 'Get your favourite car',
-        imgPath: '/images/all-cars/2.jpg',
+        imgPath: '/images/all-cars/2.webp',
     },
   
     {
         id: 3,
         label: 'located Upperhill',
-        imgPath: 'images/all-cars/3.jpg',
+        imgPath: '/images/all-cars/3.webp',
     },
   
 ]
@@ -54,7 +54,7 @@ const HomeBanner = () => {
 
 
     return (
-        <Box sx={{ position: 'relative', color: 'white'}}>
+        <Box sx={{ position: 'relative', color: 'white', overflow: 'hidden', borderRadius: { xs: 0, sm: 2 }, mx: { xs: 0, sm: 1 }, mt: { xs: 0, sm: 1 } }}>
             <AutoPlaySwipeableViews
                 axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                 index={activeStep}
@@ -87,30 +87,27 @@ const HomeBanner = () => {
                 sx={{
                     position: 'absolute', top: 0, left: 0, width: '100%',
                     display: 'flex', justifyContent: 'center',
-                    background: 'transparent', color: 'white', pl: 2, opacity: '0.8'
+                    background: 'transparent', color: 'white', opacity: '0.9',
+                    pt: 2, pb: 1, px: { xs: 2, md: 4 }
                 }}>
                 <Typography variant="h6" sx={{
-                    fontWeight: 'bold', textShadow: '0 0 10px black',
-                    px: 8, py: 1, fontSize: '15px'
+                    fontWeight: 'bold', textShadow: '0 0 12px rgba(0,0,0,0.8)',
+                    fontSize: { xs: '0.95rem', sm: '1.1rem' }
                 }}>Welcome to Miles Motors</Typography>
             </Paper>
             <Box sx={{
-                background: 'linear-gradient(#00000000, #000000cc)', pt: 8,
+                background: 'linear-gradient(transparent, rgba(0,0,0,0.85))',
+                pt: 10,
                 position: 'absolute', left: 0, bottom: 0, width: '100%',
+                px: { xs: 2, sm: 3, md: 4 }, pb: 1
             }}>
-                <Paper
-                    square
-                    elevation={0}
-                    sx={{
-                        background: 'transparent', color: '#ffffff66', pl: 2
-                    }}>
-                    <Typography variant="h1">{bannerSlides[activeStep].label}</Typography>
+                <Paper square elevation={0} sx={{ background: 'transparent', color: 'rgba(255,255,255,0.95)' }}>
+                    <Typography variant="h4" component="p" sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }, fontWeight: 600 }}>
+                        {bannerSlides[activeStep].label}
+                    </Typography>
                 </Paper>
                 <MobileStepper
-                    sx={{
-                        background: 'transparent',
-                        color: 'inherit', mt: 2
-                    }}
+                    sx={{ background: 'transparent', color: 'inherit', mt: 2 }}
                     steps={maxSteps}
                     position="static" variant="text"
                     activeStep={activeStep}

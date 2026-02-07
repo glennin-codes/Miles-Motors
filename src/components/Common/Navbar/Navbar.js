@@ -6,13 +6,43 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Menu, MenuItem, TextField } from "@mui/material";
-import { NavLink } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import SearchIcon from "@mui/icons-material/Search";
+import {
+  Menu,
+  MenuItem,
+  TextField,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+} from "@mui/material";
+import { NavLink, useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { search } from "../../../../src/features/query.js";
 import { type } from "../../../../src/features/sort.js";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faSearch} from "@fortawesome/free-solid-svg-icons";
+import useAuth from "../../../others/useAuthContext";
+
+const BRAND_OPTIONS = [
+  { value: "", label: "All brands" },
+  { value: "Toyota", label: "Toyota" },
+  { value: "Subaru", label: "Subaru" },
+  { value: "Audi", label: "Audi" },
+  { value: "Mazda", label: "Mazda" },
+  { value: "Ford", label: "Ford" },
+  { value: "Nissan", label: "Nissan" },
+  { value: "Suzuki", label: "Suzuki" },
+  { value: "Volkswagen", label: "Volkswagen" },
+  { value: "Honda", label: "Honda" },
+  { value: "Mitsubishi", label: "Mitsubishi" },
+  { value: "BMW", label: "BMW" },
+  { value: "Porsche", label: "Porsche" },
+  { value: "Mercedes Benz", label: "Mercedes Benz" },
+  { value: "Hyundai", label: "Hyundai" },
+  { value: "KIA", label: "KIA" },
+  { value: "Land Rover", label: "Land Rover" },
+  { value: "Range Rover", label: "Range Rover" },
+  { value: "Lexus", label: "Lexus" },
+];
 
 const toggleHeaderVisibility = () => {
   document.getElementById("header-links").classList.toggle("show");
@@ -29,15 +59,17 @@ function changeHeaderOnScroll() {
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const [value, setValue] = React.useState("");
+  const history = useHistory();
+  const { currentUser, logout } = useAuth();
+  const [searchValue, setSearchValue] = React.useState("");
+  const brandFilter = useSelector((state) => state.type?.type || "");
 
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const handleMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleMenu = (event) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
+
+  const applySearch = () => dispatch(search({ search: searchValue }));
+  const handleBrandChange = (e) => dispatch(type({ type: e.target.value || "" }));
 
   return (
     <>
@@ -83,75 +115,86 @@ const Navbar = () => {
               </Box>
             </Box>
 
-            {/*logo goes up */}
-            <Box sx={{ display: "flex", flex: { xs: 6, sm: 3 } }}>
+            {/* Search + Filter */}
+            <Box
+              sx={{
+                flex: { xs: 1, sm: 2, md: 2.5 },
+                display: "flex",
+                alignItems: "center",
+                gap: { xs: 1, sm: 1.5 },
+                minWidth: 0,
+                maxWidth: { xs: "100%", sm: 420 },
+              }}
+            >
               <TextField
-                onChange={(e) => {
-                  setValue(e.target.value);
-                }}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    return dispatch(search({ search: value }));
-                  }
-                }}
-                id="outlined-basic"
-                label="Search"
-                variant="outlined"
+                placeholder="Search cars..."
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && applySearch()}
                 size="small"
-                sx={{ width: "100%" }}
+                variant="outlined"
+                fullWidth
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    bgcolor: "grey.50",
+                    "&:hover": { bgcolor: "grey.100" },
+                    "&.Mui-focused": { bgcolor: "white" },
+                    "& fieldset": { borderColor: "grey.300" },
+                  },
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ color: "text.secondary" }}>
+                      <SearchIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        onClick={applySearch}
+                        aria-label="Search"
+                        sx={{
+                          bgcolor: "primary.main",
+                          color: "white",
+                          "&:hover": { bgcolor: "primary.dark" },
+                        }}
+                      >
+                        <SearchIcon fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
-
-              <button
-                style={{
-                  height: "40px",
-                  width: "30px",
-                  backgroundColor: "red",
-                  border: "none",
-                  borderRadius: "3px",
-                  outline: "none",
-                  position: "relative",
-                  right: "20px",
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  return dispatch(search({ search: value }));
+              <FormControl
+                size="small"
+                sx={{
+                  display: { xs: "none", sm: "flex" },
+                  minWidth: 130,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    bgcolor: "grey.50",
+                    "&:hover": { bgcolor: "grey.100" },
+                    "&.Mui-focused": { bgcolor: "white" },
+                    "& fieldset": { borderColor: "grey.300" },
+                  },
                 }}
               >
-
-              <FontAwesomeIcon icon={faSearch} />
-              
-              </button>
-              <select
-                onChange={(e) => {
-                  return dispatch(type({ type: e.target.value }));
-                }}
-                style={{
-                  position: "relative",
-                  right: "1vw",
-                  height: "34px",
-                  border: "none",
-                  outline: "none",
-                  marginTop: "3px",
-                  marginBottom: "2px",
-                  width: "55px",
-                }}
-              >
-                <option>sort</option>
-                <option value="Bmw">BMW</option>
-                <option value="Ford">Ford</option>
-                <option value="Porsche">Porsche</option>
-                <option value="Toyota">Toyota</option>
-                <option value="Audi">Audi</option>
-                <option value="Subaru">Subaru</option>
-                <option value="Mazda">Mazda</option>
-                <option value="Nissan">Nissan</option>
-                <option value="Suzuki">Suzuki</option>
-                <option value="Volkswagen">Volkswagen</option>
-                  <option value="Honda">Honda</option>
-                  <option value="Mitsubishi">Mitsubishi</option>
-                
-                <option></option>
-              </select>
+                <InputLabel id="navbar-brand-label">Brand</InputLabel>
+                <Select
+                  labelId="navbar-brand-label"
+                  label="Brand"
+                  value={brandFilter}
+                  onChange={handleBrandChange}
+                >
+                  {BRAND_OPTIONS.map((opt) => (
+                    <MenuItem key={opt.value || "all"} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Box>
 
             <Box flex={2}>
@@ -197,60 +240,103 @@ const Navbar = () => {
                   <Typography variant="h6">Contact</Typography>
                 </NavLink>
 
-                <div>
-                  <IconButton
-                    aria-label="account of current user"
-                    aria-controls="menu-appbar"
-                    aria-haspopup="true"
-                    onClick={handleMenu}
-                    sx={{ padding: "5px", margin: 0 }}
-                  >
-                    <Box
-                      sx={{
-                        width: "30px",
-                        height: "30px",
-                        background: "#ff000055",
-                        borderRadius: "50%",
-                        overflow: "hidden",
-                      }}
+                {currentUser ? (
+                  <div>
+                    <IconButton
+                      aria-label="account of current user"
+                      aria-controls="menu-appbar"
+                      aria-haspopup="true"
+                      onClick={handleMenu}
+                      sx={{ padding: "5px", margin: 0 }}
                     >
-                      <img src="https" alt="" style={{ width: "100%" }} />
-                    </Box>
-                  </IconButton>
-                  <Menu
-                    id="menu-appbar"
-                    anchorEl={anchorEl}
-                    anchorOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
-                    }}
-                    open={Boolean(anchorEl)}
-                    onClose={handleClose}
-                  >
-                    <NavLink
-                      to="/profile"
-                      style={{
-                        textDecoration: "none",
-                        color: "inherit",
-                      }}
-                    >
-                      <MenuItem
-                        sx={{ px: 4 }}
-                        onClick={() => {
-                          handleClose();
-                          toggleHeaderVisibility();
+                      <Box
+                        sx={{
+                          width: "30px",
+                          height: "30px",
+                          background: "#ff000055",
+                          borderRadius: "50%",
+                          overflow: "hidden",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "12px",
                         }}
                       >
-                        Profile
+                        {currentUser.email?.charAt(0).toUpperCase() || "A"}
+                      </Box>
+                    </IconButton>
+                    <Menu
+                      id="menu-appbar"
+                      anchorEl={anchorEl}
+                      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                      keepMounted
+                      transformOrigin={{ vertical: "top", horizontal: "right" }}
+                      open={Boolean(anchorEl)}
+                      onClose={handleClose}
+                    >
+                      <NavLink
+                        to="/dashboard"
+                        style={{ textDecoration: "none", color: "inherit" }}
+                      >
+                        <MenuItem
+                          sx={{ px: 4 }}
+                          onClick={() => {
+                            handleClose();
+                            toggleHeaderVisibility();
+                          }}
+                        >
+                          Dashboard
+                        </MenuItem>
+                      </NavLink>
+                      <NavLink
+                        to="/dashboard/add_car"
+                        style={{ textDecoration: "none", color: "inherit" }}
+                      >
+                        <MenuItem
+                          sx={{ px: 4 }}
+                          onClick={() => {
+                            handleClose();
+                            toggleHeaderVisibility();
+                          }}
+                        >
+                          Add Car
+                        </MenuItem>
+                      </NavLink>
+                      <NavLink
+                        to="/dashboard/manage_cars"
+                        style={{ textDecoration: "none", color: "inherit" }}
+                      >
+                        <MenuItem
+                          sx={{ px: 4 }}
+                          onClick={() => {
+                            handleClose();
+                            toggleHeaderVisibility();
+                          }}
+                        >
+                          Manage Cars
+                        </MenuItem>
+                      </NavLink>
+                      <MenuItem
+                        onClick={() => {
+                          logout();
+                          handleClose();
+                          toggleHeaderVisibility();
+                          history.push("/");
+                        }}
+                      >
+                        Logout
                       </MenuItem>
-                    </NavLink>
-                  </Menu>
-                </div>
+                    </Menu>
+                  </div>
+                ) : (
+                  <NavLink
+                    to="/login"
+                    activeClassName="active"
+                    onClick={toggleHeaderVisibility}
+                  >
+                    <Typography variant="h6">Login</Typography>
+                  </NavLink>
+                )}
               </Box>
             </Box>
           </Box>

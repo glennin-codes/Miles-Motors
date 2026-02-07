@@ -1,154 +1,157 @@
-
 import {
   Box,
   Button,
-  TextareaAutosize,
+  Card,
+  CardContent,
+  Grid,
   TextField,
   Typography,
 } from "@mui/material";
-import {React, useEffect ,useState} from "react";
+import React, { useEffect, useState } from "react";
 import { SendEmail } from "../utilis/Api";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Toast from '../utilis/Toast';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Toast from "../utilis/Toast";
+
 const Contact = () => {
-  // states
-  const[FirstName,setFirstName]=useState('')
-  const[LastName,setLastName]=useState('')
-  const[email,setEmail]=useState('')
-  const[message,setMessage]=useState('')
-  const[number,setNumber]=useState('')
+  const [FirstName, setFirstName] = useState("");
+  const [LastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [number, setNumber] = useState("");
   const [buttonLoading, setButtonLoading] = useState(false);
   const [send, setSend] = useState();
 
-///////////////////////////////////////
-
-  useEffect(()=>{
+  useEffect(() => {
     if (send) {
       toast.success(send.msg);
-      setFirstName("")
-      setLastName("")
-      setEmail("")
-      setNumber("")
-      setMessage("")
-      setSend()
-      
-       
-     
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setNumber("");
+      setMessage("");
+      setSend();
     }
-},[send])   
+  }, [send]);
 
   const onSubmit = (e) => {
     e.preventDefault();
     setButtonLoading(true);
-
-    SendEmail({ FirstName,LastName ,email,number, message, setSend }).then(
-      () => {
-        setButtonLoading(false);
-      }
-    );
+    SendEmail({ FirstName, LastName, email, number, message, setSend })
+      .then(() => setButtonLoading(false))
+      .catch(() => setButtonLoading(false));
   };
 
   return (
     <>
-    <Toast/>
-    <Box sx={{ display: "flex", justifyContent: { xs: "center" } }}>
+      <Toast />
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          margin: { sm: 5 },
+          maxWidth: 720,
+          mx: "auto",
+          px: { xs: 2, sm: 3 },
+          py: { xs: 4, md: 6 },
         }}
       >
-        <Typography variant="h4" fontSize="bold">
-          Contact Us
-        </Typography>
-        <Typography>Got any question? Send us a message below.</Typography>
-        <form onSubmit={onSubmit}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              gap: 1,
-            }}
-          >
-            <Box
-              sx={{ display: "flex", flexDirection: "column", marginTop: 2 }}
-            >
-              <label htmlFor="First name" id="FirstName">
-                First name
-              </label>
-              <TextField
-                
-                id="FirstName"
-                placeholder="Enter your first name"
-                value={FirstName}
-                required
-                onChange={(e)=>setFirstName(e.target.value)}
-              />
-            </Box>
-            <Box
-              sx={{ display: "flex", flexDirection: "column", marginTop: 2 }}
-            >
-              <label htmlFor="Last name" id="LastName">
-                Last name
-              </label>
-              <TextField
-                id="LastName"
-                placeholder="Enter your last name"
-                value={LastName}
-                required
-                onChange={(e)=>setLastName(e.target.value)}
-              />
-            </Box>
-          </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", marginTop: 2 }}>
-            <label htmlFor="email" id="email">
-              Email
-            </label>
-            <TextField
-              id="email"
-              type="email"
-              placeholder="youremail@email.com"
-              value={email}
-              required
-              onChange={(e)=>setEmail(e.target.value)}
-            />
-          </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", marginTop: 2 }}>
-            <label htmlFor="number" id="number">
-              Phone Number
-            </label>
-            <TextField id="number" type="number" required value={number} onChange={(e)=>setNumber(e.target.value)}/>
-            <Box
-              sx={{ marginTop: 2, display: "flex", flexDirection: "column" }}
-            >
-              <label htmlFor="message" id="message">
-                Message
-              </label>
-              <TextareaAutosize
-                aria-label="minimum height"
-                minRows={7}
-                id="message"
-                required
-                placeholder="Send us a message and we'll reply as soon as possible.."
-                style={{ margin: 5 }}
-                value={message}
-                onChange={(e)=>setMessage(e.target.value)}
-              />
-            </Box>
+        <Box sx={{ textAlign: "center", mb: 4 }}>
+          <Typography variant="h4" fontWeight="700" color="text.primary" gutterBottom>
+            Contact Us
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Got a question? Send us a message below.
+          </Typography>
+        </Box>
 
-            <Button
-              variant="contained"
-              sx={{ width: "100%" }}
-              type="submit"
-            > {buttonLoading ? 'SENDING..' : 'SEND'}</Button>
-          </Box>
-        </form>
-      
+        <Card variant="outlined" sx={{ borderRadius: 2, borderColor: "grey.200" }}>
+          <CardContent sx={{ p: { xs: 2, sm: 4 } }}>
+            <form onSubmit={onSubmit}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="First name"
+                    placeholder="Enter your first name"
+                    value={FirstName}
+                    required
+                    onChange={(e) => setFirstName(e.target.value)}
+                    variant="outlined"
+                    size="medium"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Last name"
+                    placeholder="Enter your last name"
+                    value={LastName}
+                    required
+                    onChange={(e) => setLastName(e.target.value)}
+                    variant="outlined"
+                    size="medium"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    required
+                    onChange={(e) => setEmail(e.target.value)}
+                    variant="outlined"
+                    size="medium"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Phone number"
+                    type="tel"
+                    placeholder="+254 ..."
+                    value={number}
+                    onChange={(e) => setNumber(e.target.value)}
+                    variant="outlined"
+                    size="medium"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Message"
+                    placeholder="Send us a message and we'll reply as soon as possible."
+                    value={message}
+                    required
+                    onChange={(e) => setMessage(e.target.value)}
+                    variant="outlined"
+                    multiline
+                    rows={5}
+                    size="medium"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    fullWidth
+                    disabled={buttonLoading}
+                    sx={{
+                      py: 1.5,
+                      textTransform: "none",
+                      fontWeight: 600,
+                      fontSize: "1rem",
+                    }}
+                  >
+                    {buttonLoading ? "Sending…" : "Send message"}
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
+          </CardContent>
+        </Card>
       </Box>
-    </Box>
     </>
   );
 };

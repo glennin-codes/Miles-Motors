@@ -3,6 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
+import PasswordField from './Common/PasswordField/PasswordField';
 import {useRef} from "react"
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
@@ -26,22 +27,21 @@ export default function SignUp() {
     const emailRef=useRef();
     const passwordRef=useRef();
     const passwordConfirmationRef=useRef();
- async  function handleSubmit(e){
-        e.preventDefault()
-         if(passwordRef.current.value !== passwordConfirmationRef.current.value){
-return setError(`passwords do not match`)
-    }
-    try{
-        setError('')
-        setLoading(true)
- await  signUp(emailRef.current.value,passwordRef.current.value)
- history.push('/profile')
-    }
-    catch(error){
-setError(`failed to create an account!${error}`)
-    }
-    setLoading(false)
-      
+    async function handleSubmit(e) {
+      e.preventDefault();
+      if (passwordRef.current.value !== passwordConfirmationRef.current.value) {
+        return setError('Passwords do not match');
+      }
+      try {
+        setError('');
+        setLoading(true);
+        await signUp(emailRef.current.value, passwordRef.current.value);
+        history.push('/profile');
+      } catch (err) {
+        setError(err.response?.data?.msg || err.message || 'Registration failed');
+      } finally {
+        setLoading(false);
+      }
     } 
    
 
@@ -61,7 +61,7 @@ setError(`failed to create an account!${error}`)
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up
+            Admin Register
           </Typography>
           {error && <Alert severity="error">{error}</Alert>}
 
@@ -80,27 +80,25 @@ setError(`failed to create an account!${error}`)
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
+                <PasswordField
                   required
                   fullWidth
                   name="password"
                   label="Password"
-                  type="password"
                   id="password"
-                   inputRef={passwordRef}
+                  inputRef={passwordRef}
                   autoComplete="new-password"
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
+                <PasswordField
                   required
                   fullWidth
                   name="confirm_password"
-                  label="Confirm_Password"
-                  type="password"
-                  id="password"
-                   inputRef={passwordConfirmationRef}
-                  autoComplete="confirm_password"
+                  label="Confirm password"
+                  id="confirm_password"
+                  inputRef={passwordConfirmationRef}
+                  autoComplete="new-password"
                 />
               </Grid>
             
@@ -116,7 +114,7 @@ setError(`failed to create an account!${error}`)
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/login" variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>

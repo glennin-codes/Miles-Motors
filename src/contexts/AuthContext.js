@@ -1,54 +1,53 @@
-import React, { createContext,useEffect } from 'react';
+import React, { createContext, useState, useCallback } from 'react';
+import { getAdmin, getAuthToken, setAuthToken, setAdmin } from '../api/config';
+import * as authApi from '../api/auth';
 
-import {auth} from "../firebase.js"
+export const AuthContext = createContext();
 
-export const AuthContext = createContext()
+export const AuthContextProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(() => (getAuthToken() && getAdmin()) || null);
 
-export const AuthContextProvider = ({ children, firebaseFunctions }) => {
-    const [currentUser,setCurrentUser]=React.useState()
-    const[loading,setLoading]= React.useState(true)
-    function login (email,password){
-        return auth.signInWithEmailAndPassword(email,password)
-    }
-    function logout (){
-        return auth.signOut
-    }
-    function resetPassword(email){
-        return auth.sendPasswordResetEmail(email)
-    }
- useEffect(()=>{
-const unsubscribe=auth.onAuthStateChanged(user=>{
-   
-    setCurrentUser(user)
-     setLoading(false)
-})
-return unsubscribe
+  const login = useCallback(async (email, password) => {
+    const data = await authApi.login(email, password);
+    setCurrentUser(data.admin);
+    return data;
+  }, []);
 
- }
- ,[])   
-function signUp(email,password){
-  return   auth.createUserWithEmailAndPassword(email,password)
-}
-function updateEmail(email){
-return currentUser.updateEmail(email)
-}
-function updatePassword(password){
- return currentUser.updatePassword(password)   
-}
+  const signUp = useCallback(async (email, password) => {
+    const data = await authApi.register(email, password);
+    setCurrentUser(data.admin);
+    return data;
+  }, []);
 
-    const value={
-        currentUser,
-        signUp,
-        login,
-        logout,
-        resetPassword,
-        updateEmail,
-        updatePassword
-    }
-    return (
-        <AuthContext.Provider value={value}>
-            { !loading && children}
-        </AuthContext.Provider>
-    );
+  const logout = useCallback(() => {
+    setAuthToken(null);
+    setAdmin(null);
+    setCurrentUser(null);
+  }, []);
+
+  const updateProfileCb = useCallback(async (currentPassword, { email, newPassword } = {}) => {
+    const data = await authApi.updateProfile({ currentPassword, email, newPassword });
+    if (data.admin) setCurrentUser(data.admin);
+    return data;
+  }, []);
+
+  const value = {
+    currentUser,
+    user: currentUser ? { ...currentUser, role: 'admin' } : null,
+    login,
+    loginEmail: login,
+    logout,
+    logOut: logout,
+    signUp,
+    updateProfile: updateProfileCb,
+    resetPassword: async () => { throw new Error('Password reset not implemented'); },
+    updateEmail: async () => { throw new Error('Use updateProfile instead'); },
+    updatePassword: async () => { throw new Error('Use updateProfile instead'); },
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
-

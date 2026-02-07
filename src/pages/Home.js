@@ -10,34 +10,38 @@ import HomeBanner from '../components/Homepage/HomeBanner';
 
 const Home = () => {
     return (
-        <div>
-            {/* home banner */}
-            <Box>
+        <Box sx={{ minHeight: '100vh' }}>
+            <Box sx={{ px: { xs: 0, sm: 1, md: 2 } }}>
                 <HomeBanner />
             </Box>
 
-        
-        
-            {/* offers section */}
-            <section>
-                <CarsSection  dataAmount={50} />
-                <Box sx={{ textAlign: 'center', my: 6 }}>
-                    <NavLink to="/cars"
-                        style={{ textDecoration: 'none' }}>
-                        <Button variant="outlined" color="primary"
+            <Box component="section" sx={{ py: { xs: 4, md: 6 }, px: { xs: 2, sm: 3, md: 4 } }}>
+                <CarsSection dataAmount={50} />
+                <Box sx={{ textAlign: 'center', mt: 6, mb: 4 }}>
+                    <NavLink to="/cars" style={{ textDecoration: 'none' }}>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            size="large"
                             sx={{
-                                px: 4, py: 1.5, fontSize: '20px',
-                                borderRadius: '5px'
+                                px: 4,
+                                py: 1.5,
+                                fontSize: '1rem',
+                                borderRadius: 2,
+                                textTransform: 'none',
+                                fontWeight: 600,
                             }}
-                        >View More</Button></NavLink>
+                        >
+                            View more cars
+                        </Button>
+                    </NavLink>
                 </Box>
-               
-            </section>
+            </Box>
 
             <Box sx={{ background: 'url(/images/homepage/review-back.jpg) no-repeat fixed center center', backgroundSize: 'cover' }}>
                 {/* <ReviewSection /> */}
             </Box>
-        </div>
+        </Box>
     );
 };
 

@@ -5,6 +5,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Redirect,
   useLocation,
 } from "react-router-dom";
 
@@ -26,8 +27,7 @@ import SocialFlow from "./components/Common/socialFlow/socialFlow";
 import LoadingSpinner from "./components/Common/LoadingSpinner/LoadingSpinner";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
-import AddNewCar from "./components/Dashboard/AdminParts/AddNewCar.js";
-import ManageCars from "./components/Dashboard/AdminParts/ManageCars.js";
+import Dashboard from "./pages/Dashboard";
 
 // customize mui theme
 export const theme = createTheme({
@@ -136,8 +136,9 @@ function App() {
                   <Reset />
                 </Route>
 
-                <PrivateRoute exact path="/profile" component={AddNewCar} />
-                <PrivateRoute exact path="/manage" component={ManageCars} />
+                <PrivateRoute path="/dashboard" component={Dashboard} />
+                <Route exact path="/profile"><Redirect to="/dashboard/add_car" /></Route>
+                <Route exact path="/manage"><Redirect to="/dashboard/manage_cars" /></Route>
                 <PrivateRoute exact path="/update" component={UpdateProfile} />
 
                 {/* private routes */}
